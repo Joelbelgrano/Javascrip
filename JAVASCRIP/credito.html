@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>Simulador de Créditos</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -10,34 +11,41 @@
 <body>
     <div class="container">
         <h2>Simulador de Créditos</h2>
-        <label for="tipoPrestamo">Tipo de Préstamo:</label>
-        <select id="tipoPrestamo">
-            <option value="personal">Personal</option>
-            <option value="hipotecario">Hipotecario</option>
-            <option value="automotriz">Automotriz</option>
-            <option value="estudiantil">Estudiantil</option>
-        </select>
 
-        <label for="capital">Capital Inicial:</label>
-        <input type="text" id="capital" placeholder="Ingrese el capital inicial" oninput="validarEntrada(this)">
+        <section class="simulador-form">
+            <label for="tipoPrestamo">Tipo de Préstamo:</label>
+            <select id="tipoPrestamo">
+                <option value="personal">Personal</option>
+                <option value="hipotecario">Hipotecario</option>
+                <option value="automotriz">Automotriz</option>
+                <option value="estudiantil">Estudiantil</option>
+            </select>
 
-        <label for="meses">Número de Meses:</label>
-        <input type="text" id="meses" placeholder="Ingrese el número de meses" oninput="validarEntrada(this)">
+            <label for="capital">Capital Inicial:</label>
+            <input type="text" id="capital" placeholder="Ingrese el capital inicial" oninput="validarEntrada(this)">
 
-        <label for="tipoTasa">Tipo de Tasa de Interés:</label>
-        <select id="tipoTasa">
-            <option value="fija">Fija</option>
-            <option value="variable">Variable</option>
-        </select>
+            <label for="meses">Número de Meses:</label>
+            <input type="text" id="meses" placeholder="Ingrese el número de meses" oninput="validarEntrada(this)">
 
-        <button onclick="simuladorDeCredito()">Calcular Cuota Mensual</button>
+            <label for="tipoTasa">Tipo de Tasa de Interés:</label>
+            <select id="tipoTasa">
+                <option value="fija">Fija</option>
+                <option value="variable">Variable</option>
+            </select>
 
-        <div class="result" id="resultado"></div>
-        <div class="warning" id="advertencia"></div>
-        <div class="balance" id="balance"></div>
-        <div class="amortizacion" id="amortizacion"></div>
-        <div class="percentages" id="porcentajes"></div>
-        <canvas id="grafico"></canvas>
+            <button onclick="simuladorDeCredito()">Calcular Cuota Mensual</button>
+            <button onclick="simularConPrompt()">Simular con Prompt</button>
+        </section>
+
+        <section class="resultados">
+            <div class="result" id="resultado"></div>
+            <div class="warning" id="advertencia"></div>
+            <div class="balance" id="balance"></div>
+            <div class="amortizacion" id="amortizacion"></div>
+            <div class="percentages" id="porcentajes"></div>
+            <div class="historial" id="historial"></div>
+            <canvas id="grafico"></canvas>
+        </section>
     </div>
     <script src="script.js"></script>
 </body>
