@@ -33,8 +33,8 @@
                 <option value="variable">Variable</option>
             </select>
 
-            <button onclick="simuladorDeCredito()">Calcular Cuota Mensual</button>
-            <button onclick="simularConPrompt()">Simular con Prompt</button>
+            <button id="calcularBtn">Calcular Cuota Mensual</button>
+            <button id="simularPromptBtn">Simular con Prompt</button>
         </section>
 
         <section class="resultados">
@@ -43,15 +43,15 @@
             <div class="balance" id="balance"></div>
             <div class="amortizacion" id="amortizacion"></div>
             <div class="percentages" id="porcentajes"></div>
-            <div class="historial" id="historial"></div>
+
+            <div class="historial">
+                <button id="toggleHistorialBtn" aria-expanded="false">Mostrar Historial</button>
+                <div id="historialContent" class="historial-content" style="display: none;"></div>
+            </div>
+            
             <canvas id="grafico"></canvas>
         </section>
     </div>
     <script src="script.js"></script>
 </body>
 </html>
-
-
-
-
-

@@ -6,8 +6,8 @@ const tasasDeInteres = {
     estudiantil: { fija: 5, variable: 7 }
 };
 
-// historial de simulaciones
-let historialSimulaciones = [{}];  // array para un cálculo.
+// Cargar historial de simulaciones desde el localStorage
+let historialSimulaciones = JSON.parse(localStorage.getItem('historialSimulaciones')) || [];
 
 // Configuración del gráfico
 const ctx = document.getElementById('grafico').getContext('2d');
@@ -54,13 +54,9 @@ function actualizarGrafico(labels, data) {
 // Función para validar la entrada del usuario
 function validarEntrada(element) {
     const value = parseFloat(element.value);
-    if (isNaN(value) || value <= 0) {
-        element.classList.add('invalid');
-        element.style.borderColor = 'red';
-    } else {
-        element.classList.remove('invalid');
-        element.style.borderColor = '';
-    }
+    const invalid = isNaN(value) || value <= 0;
+    element.classList.toggle('invalid', invalid);
+    element.style.borderColor = invalid ? 'red' : '';
 }
 
 // Función para calcular la cuota mensual
@@ -100,9 +96,9 @@ function mostrarPorcentajes(tipoPrestamo, tipoTasa) {
     `;
 }
 
-// Función para agregar o reemplazar la simulación en el historial
+// Función para agregar o reemplazar la simulación en el historial y guardarlo en localStorage
 function agregarHistorial(tipoPrestamo, capital, meses, tipoTasa, cuotaMensual, balances) {
-    historialSimulaciones[0] = { 
+    const simulacion = { 
         tipoPrestamo,
         capital,
         meses,
@@ -110,26 +106,37 @@ function agregarHistorial(tipoPrestamo, capital, meses, tipoTasa, cuotaMensual, 
         cuotaMensual,
         balances
     };
+
+    // nueva simulación al historial y limitar a un máximo de 5 simulaciones
+    if (historialSimulaciones.length >= 5) {
+        historialSimulaciones.shift(); 
+    }
+    historialSimulaciones.push(simulacion);
+
+    // Guardar historial en localStorage
+    localStorage.setItem('historialSimulaciones', JSON.stringify(historialSimulaciones));
 }
 
 // Función para mostrar el historial de simulaciones en la página
 function mostrarHistorial() {
-    const historialDiv = document.getElementById("historial");
+    const historialDiv = document.getElementById("historialContent");
     let historialTexto = "<h3>Historial de Simulaciones:</h3>";
 
-    if (Object.keys(historialSimulaciones[0]).length === 0) {
+    if (historialSimulaciones.length === 0) {
         historialTexto += "<p>No hay simulaciones en el historial.</p>";
     } else {
-        const simulacion = historialSimulaciones[0]; 
-        const balancesTexto = simulacion.balances.map((balance, index) => `Mes ${index + 1}: $${balance}`).join('<br>');
-        historialTexto += `
-            <h4>Tipo de Préstamo: ${simulacion.tipoPrestamo}</h4>
-            Capital Inicial: $${simulacion.capital}<br>
-            Número de Meses: ${simulacion.meses}<br>
-            Tipo de Tasa: ${simulacion.tipoTasa}<br>
-            Cuota Mensual: $${simulacion.cuotaMensual}<br>
-            Balance Restante:<br>${balancesTexto}<br><br>
-        `;
+        historialSimulaciones.forEach((simulacion, index) => {
+            const balancesTexto = simulacion.balances.map((balance, i) => `Mes ${i + 1}: $${balance}`).join('<br>');
+            historialTexto += `
+                <h4>Simulación ${index + 1}</h4>
+                Tipo de Préstamo: ${simulacion.tipoPrestamo}<br>
+                Capital Inicial: $${simulacion.capital}<br>
+                Número de Meses: ${simulacion.meses}<br>
+                Tipo de Tasa: ${simulacion.tipoTasa}<br>
+                Cuota Mensual: $${simulacion.cuotaMensual}<br>
+                Balance Restante:<br>${balancesTexto}<br><br>
+            `;
+        });
     }
 
     historialDiv.innerHTML = historialTexto;
@@ -161,55 +168,60 @@ function simuladorDeCredito() {
     const meses = parseInt(document.getElementById("meses").value);
     const tipoTasa = document.getElementById("tipoTasa").value;
 
+    // Validar la entrada del usuario
     if (isNaN(capital) || isNaN(meses) || capital <= 0 || meses <= 0) {
-        document.getElementById("resultado").innerText = "Por favor, ingrese valores válidos.";
-        document.getElementById("advertencia").innerText = "";
-        document.getElementById("balance").innerText = "";
-        document.getElementById("amortizacion").innerText = "";
-        document.getElementById("porcentajes").innerText = "";
+        actualizarElemento('resultado', 'Por favor, ingrese valores válidos.');
+        actualizarElemento('advertencia', '');
+        actualizarElemento('balance', '');
+        actualizarElemento('amortizacion', '');
+        actualizarElemento('porcentajes', '');
         return;
     }
 
     const tasaInteresAnual = tasasDeInteres[tipoPrestamo][tipoTasa];
     const cuotaMensual = calcularCuotaMensual(capital, tasaInteresAnual, meses);
 
-    document.getElementById("resultado").innerText = `La cuota mensual es: $${cuotaMensual}`;
+    // Mostrar advertencia si la tasa de interés es alta
+    if (tasaInteresAnual > 15) {     
+        actualizarElemento('advertencia', 'Advertencia: La tasa de interés es muy alta.');
+    } else {
+        actualizarElemento('advertencia', '');
+    }
 
-    document.getElementById("advertencia").innerText = tasaInteresAnual > 8 ? "Advertencia: La tasa de interés es muy alta." : "";
-
+    // Calcular balances y actualizar el DOM
     const { balances, labels } = calcularBalance(capital, tasaInteresAnual, meses, cuotaMensual);
-    document.getElementById("balance").innerHTML = balances.map((balance, index) => `Mes ${index + 1}: $${balance}`).join('<br>');
-
-    document.getElementById("amortizacion").innerHTML = `<h3>Resumen del Plan de Pagos:</h3>${balances.map((balance, index) => `Mes ${index + 1}: $${balance}`).join('<br>')}`;
-
+    const balanceTexto = balances.map((balance, index) => `Mes ${index + 1}: $${balance}`).join('<br>');
+    
+    actualizarElemento('balance', `<h3>Balances Restantes:</h3><p>${balanceTexto}</p>`);
+    actualizarElemento('amortizacion', `<h3>Resumen del Plan de Pagos:</h3><p>${balanceTexto}</p>`);
     mostrarPorcentajes(tipoPrestamo, tipoTasa);
-
     agregarHistorial(tipoPrestamo, capital, meses, tipoTasa, cuotaMensual, balances);
     mostrarHistorial();
     actualizarGrafico(labels, balances);
 }
 
-// Función para simular el crédito utilizando prompt
+// Simulación mediante prompt
 function simularConPrompt() {
     const tipoPrestamo = prompt("Ingrese el tipo de préstamo (personal, hipotecario, automotriz, estudiantil):");
     const capital = parseFloat(prompt("Ingrese el capital inicial:"));
     const meses = parseInt(prompt("Ingrese el número de meses:"));
-    const tipoTasa = prompt("Ingrese el tipo de tasa de interés (fija, variable):");
+    const tipoTasa = prompt("Ingrese el tipo de tasa (fija, variable):");
 
-    if (isNaN(capital) || isNaN(meses) || capital <= 0 || meses <= 0 || !tasasDeInteres[tipoPrestamo] || !tasasDeInteres[tipoPrestamo][tipoTasa]) {
-        alert("Por favor, ingrese valores válidos.");
+    // Validar la entrada del usuario
+    if (isNaN(capital) || isNaN(meses) || capital <= 0 || meses <= 0) {
+        alert('Por favor, ingrese valores válidos.');
         return;
     }
 
     const tasaInteresAnual = tasasDeInteres[tipoPrestamo][tipoTasa];
     const cuotaMensual = calcularCuotaMensual(capital, tasaInteresAnual, meses);
 
-    alert(`La cuota mensual es: $${cuotaMensual}`);
-
-    if (tasaInteresAnual > 8) {
+    // Mostrar advertencia si la tasa de interés es alta
+    if (tasaInteresAnual > 15) {
         alert("Advertencia: La tasa de interés es muy alta.");
     }
 
+    // Calcular balances y mostrar resultados
     const { balances, labels } = calcularBalance(capital, tasaInteresAnual, meses, cuotaMensual);
     const balanceTexto = balances.map((balance, index) => `Mes ${index + 1}: $${balance}`).join('\n');
     alert(`Balances Restantes:\n${balanceTexto}`);
@@ -222,3 +234,37 @@ function simularConPrompt() {
     mostrarHistorial();
     actualizarGrafico(labels, balances);
 }
+
+// Función para actualizar el contenido de un elemento por su id
+function actualizarElemento(id, contenido) {
+    document.getElementById(id).innerHTML = contenido;
+}
+
+// Función para alternar la visibilidad del historial
+function toggleHistorial() {
+    const historialContent = document.getElementById("historialContent");
+    if (historialContent.style.display === "none" || historialContent.style.display === "") {
+        historialContent.style.display = "block";
+    } else {
+        historialContent.style.display = "none";
+    }
+}
+
+// Mejorar la detección de eventos de usuario
+document.getElementById('calcularBtn').addEventListener('click', simuladorDeCredito);
+document.getElementById('simularPromptBtn').addEventListener('click', simularConPrompt);
+document.getElementById('toggleHistorialBtn').addEventListener('click', toggleHistorial);
+document.querySelectorAll('input').forEach(input => {
+    input.addEventListener('input', () => validarEntrada(input));
+});
+
+// Mostrar historial al cargar la página
+window.addEventListener('load', mostrarHistorial);
+document.getElementById('toggleHistorialBtn').addEventListener('click', function() {
+    const historialContent = document.getElementById('historialContent');
+    if (historialContent.classList.contains('show')) {
+        historialContent.classList.remove('show');
+    } else {
+        historialContent.classList.add('show');
+    }
+});
