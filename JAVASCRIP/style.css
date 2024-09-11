@@ -57,12 +57,14 @@ button:hover {
     margin-top: 20px;
 }
 
-.historial {
+.historial,
+.datos-externos {
     margin-top: 20px;
     position: relative;
 }
 
-#toggleHistorialBtn {
+#toggleHistorialBtn,
+#toggleDatosBtn {
     width: 100%;
     background-color: #007BFF;
     color: white;
@@ -72,24 +74,27 @@ button:hover {
     padding: 10px;
 }
 
-#toggleHistorialBtn:hover {
+#toggleHistorialBtn:hover,
+#toggleDatosBtn:hover {
     background-color: #0056b3;
 }
 
-.historial-content {
-    display: none; 
+.historial-content,
+.datos-externos-content {
+    display: none;
     max-height: 200px;
     overflow-y: auto;
     border: 1px solid #ccc;
     border-radius: 4px;
     padding: 10px;
-    background-color: #f9f9f9;
+    background-color: #a7a5a5;
     margin-top: 10px;
-    transition: max-height 0.3s ease-out; 
+    transition: max-height 0.3s ease-out;
 }
 
-.historial-content.show {
-    display: block; 
+.historial-content.show,
+.datos-externos-content.show {
+    display: block;
 }
 
 canvas {
@@ -109,7 +114,59 @@ canvas {
         padding: 8px;
     }
 
-    .historial-content {
+    .historial-content,
+    .datos-externos-content {
         max-height: 150px;
     }
+}
+/*modo nocturno */
+.modo-nocturno-btn {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    width: 40px;
+    height: 40px;
+    background-color: #333;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s;
+}
+
+.modo-nocturno-btn:hover {
+    background-color: #555;
+}
+
+/* Estilos modo nocturno */
+.modo-nocturno {
+    background-color: #121212;
+    color: #e0e0e0;
+}
+
+.modo-nocturno .container {
+    background-color: #1e1e1e;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
+}
+
+.modo-nocturno button {
+    background-color: #555;
+    color: #e0e0e0;
+}
+
+.modo-nocturno button:hover {
+    background-color: #777;
+}
+
+.modo-nocturno input,
+.modo-nocturno select {
+    background-color: #333;
+    color: #e0e0e0;
+    border-color: #444;
 }

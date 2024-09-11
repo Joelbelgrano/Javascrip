@@ -9,6 +9,8 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
+    <button id="modoNocturnoBtn" class="modo-nocturno-btn">🌙</button>
+
     <div class="container">
         <h2>Simulador de Créditos</h2>
 
@@ -35,6 +37,7 @@
 
             <button id="calcularBtn">Calcular Cuota Mensual</button>
             <button id="simularPromptBtn">Simular con Prompt</button>
+            
         </section>
 
         <section class="resultados">
@@ -45,10 +48,16 @@
             <div class="percentages" id="porcentajes"></div>
 
             <div class="historial">
-                <button id="toggleHistorialBtn" aria-expanded="false">Mostrar Historial</button>
-                <div id="historialContent" class="historial-content" style="display: none;"></div>
+                <button id="toggleHistorialBtn" aria-expanded="false">Mostrar/Ocultar Historial</button>
+                <div id="historialContent" class="historial-content"></div>
             </div>
-            
+
+            <div class="datos-externos">
+                <button id="toggleDatosBtn">Mostrar Datos Externos</button>
+                <div id="datosExternosContent" class="datos-externos-content">
+                </div>
+            </div>
+
             <canvas id="grafico"></canvas>
         </section>
     </div>

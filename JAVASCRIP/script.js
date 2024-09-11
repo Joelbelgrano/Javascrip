@@ -107,7 +107,7 @@ function agregarHistorial(tipoPrestamo, capital, meses, tipoTasa, cuotaMensual, 
         balances
     };
 
-    // nueva simulación al historial y limitar a un máximo de 5 simulaciones
+    // nueva simulación para historial y limitar a un máximo de 5 simulaciones
     if (historialSimulaciones.length >= 5) {
         historialSimulaciones.shift(); 
     }
@@ -243,28 +243,59 @@ function actualizarElemento(id, contenido) {
 // Función para alternar la visibilidad del historial
 function toggleHistorial() {
     const historialContent = document.getElementById("historialContent");
-    if (historialContent.style.display === "none" || historialContent.style.display === "") {
-        historialContent.style.display = "block";
+    if (historialContent.classList.contains('show')) {
+        historialContent.classList.remove('show');
     } else {
-        historialContent.style.display = "none";
+        historialContent.classList.add('show');
     }
 }
 
-// Mejorar la detección de eventos de usuario
+// Función para alternar la visibilidad de datos externos
+function toggleDatosExternos() {
+    const datosExternosContent = document.getElementById("datosExternosContent");
+    if (datosExternosContent.classList.contains('show')) {
+        datosExternosContent.classList.remove('show');
+    } else {
+        datosExternosContent.classList.add('show');
+    }
+}
+
+// Función para cargar datos externos mediante AJAX
+function cargarDatosExternos() {
+    fetch('https://www.alphavantage.co/query?function=FEDERAL_FUNDS_RATE&apikey=TU_CLAVE_API') // Cambiar la URL por una API real
+        .then(response => response.json())
+        .then(data => {
+            const datosExternosDiv = document.getElementById("datosExternosContent");
+            let datosTexto = "<h3>Datos Externos:</h3>";
+            data.forEach(item => {
+                datosTexto += `<p>Tipo: ${item.tipo} | Tasa: ${item.tasa}%</p>`;
+            });
+            datosExternosDiv.innerHTML = datosTexto;
+        })
+        .catch(error => console.error('Error al cargar datos externos:', error));
+}
+
+// Inicialización de eventos
 document.getElementById('calcularBtn').addEventListener('click', simuladorDeCredito);
 document.getElementById('simularPromptBtn').addEventListener('click', simularConPrompt);
 document.getElementById('toggleHistorialBtn').addEventListener('click', toggleHistorial);
+document.getElementById('toggleDatosBtn').addEventListener('click', () => {
+    toggleDatosExternos();
+    cargarDatosExternos();
+});
 document.querySelectorAll('input').forEach(input => {
     input.addEventListener('input', () => validarEntrada(input));
 });
 
 // Mostrar historial al cargar la página
 window.addEventListener('load', mostrarHistorial);
-document.getElementById('toggleHistorialBtn').addEventListener('click', function() {
-    const historialContent = document.getElementById('historialContent');
-    if (historialContent.classList.contains('show')) {
-        historialContent.classList.remove('show');
-    } else {
-        historialContent.classList.add('show');
-    }
-});
+
+// Función para alternar el modo nocturno
+function toggleModoNocturno() {
+    document.body.classList.toggle('modo-nocturno');
+    const esModoNocturno = document.body.classList.contains('modo-nocturno');
+    document.getElementById('modoNocturnoBtn').textContent = esModoNocturno ? '🌞' : '🌙';
+}
+
+// Inicializar el botón de modo nocturno
+document.getElementById('modoNocturnoBtn').addEventListener('click', toggleModoNocturno);
